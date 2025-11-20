@@ -284,10 +284,100 @@
           </button>
         </li>
       </ul>
-<div class="tab-content">
-        
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="panel-resumen" role="tabpanel">
+          <div class="card mb-3">
+            <div class="card-body">
+              <p class="mb-2">
+                La tabla muestra el <strong>número absoluto y relativo de usos</strong>
+                de cada herramienta, el número de personas que la utilizan,
+                su <strong>valoración media y ponderada</strong> y
+                cuántas personas <strong>pagan por ella</strong>.
+              </p>
+              <p class="small text-muted mb-0">
+                La <strong>valoración ponderada</strong> combina la nota media con el volumen de uso:
+                da más peso a las herramientas que se usan más a menudo y están bien valoradas
+                (comparado con la herramienta más utilizada).
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <table id="tablaHerramientas" class="table table-striped table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Herramienta</th>
+                    <th>Usos absolutos</th>
+                    <th>% de usos</th>
+                    <th>Personas que la usan</th>
+                    <th>% de personas que usan IA</th>
+                    <th>Valoración media</th>
+                    <th>Valoración ponderada</th>
+                    <th>Personas que pagan</th>
+                    <th>% de quienes la usan que pagan</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="panel-graficos" role="tabpanel">
+          <div class="row g-3">
+            <div class="col-md-7">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="stat-label mb-0">Ranking por número de usos</div>
+                    <div class="small text-muted">Top herramientas por volumen de uso</div>
+                  </div>
+                  <canvas id="chartUsosHerramientas" height="200"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="stat-label mb-0">Valoración media por herramienta</div>
+                    <div class="small text-muted">Sobre una escala de 1 a 5</div>
+                  </div>
+                  <canvas id="chartValoracionesHerramientas" height="200"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="mb-4">
+      <div class="section-title">
+        <i class="bi bi-gear-wide-connected"></i>
+        Análisis de Procesos y Áreas con IA
+      </div>
+      <ul class="nav nav-pills mb-3" id="processTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-procesos-resumen" data-bs-toggle="pill"
+            data-bs-target="#panel-procesos-resumen" type="button" role="tab">
+            Usos por Proceso
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-procesos-area" data-bs-toggle="pill"
+            data-bs-target="#panel-procesos-area" type="button" role="tab">
+            Análisis por Área
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-graficos-area" data-bs-toggle="pill"
+            data-bs-target="#panel-graficos-area" type="button" role="tab">
+            Gráficos por Valoración
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content">
         <div class="tab-pane fade show active" id="panel-procesos-resumen" role="tabpanel">
-
+          
           <div class="filter-chip mb-3">
             <label for="filtroAreaProcesos">Filtrar por Área</label>
             <select id="filtroAreaProcesos" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
@@ -385,6 +475,78 @@
           </div>
         </div>
       </div>
+    </section>
+    <section class="mb-4">
+      <div class="section-title mb-2">
+        <i class="bi bi-chat-left-text-fill"></i>
+        Comentarios cualitativos
+      </div>
+      <p>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComentarios" aria-expanded="false" aria-controls="collapseComentarios">
+          Ver / Ocultar Comentarios
+        </button>
+      </p>
+      <div class="collapse" id="collapseComentarios">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row g-2 align-items-center flex-wrap">
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100">
+                  <label for="filtroArea">Área</label>
+                  <select id="filtroArea" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100">
+                  <label for="filtroCategoria">Categoría</label>
+                  <select id="filtroCategoria" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3 col-12">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="filtroSubcategoria">Subcategoría</label>
+                  <select id="filtroSubcategoria" class="form-select form-select-sm border-0 bg-transparent d-inline w-100">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="filtroHerramienta">Herramienta</label>
+                  <select id="filtroHerramienta" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="filtroIa">Uso de IA</label>
+                  <select id="filtroIa" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                    <option value="si">Sí usan IA</option>
+                    <option value="no">No usan IA</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3 col-12">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="busquedaTexto">Texto</label>
+                  <input id="busquedaTexto" type="text" class="form-control form-control-sm border-0 bg-transparent d-inline w-auto"
+                    placeholder="Buscar en comentarios…" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="contenedorComentarios"></div>
+        <p class="small text-muted mt-2" id="resumenComentarios"></p>
+      </div>
+    </section>
+  </main>
   <footer>
     Panel generado automáticamente a partir del fichero <strong>fontaneria_datos.xlsx</strong>.
   </footer>
@@ -663,7 +825,8 @@
       }
     }
 
-function filterUsageDataByArea(selectedArea) {
+    // --- FUNCIÓN CORREGIDA: Filtra herramientas por área (sin duplicados) ---
+    function filterUsageDataByArea(selectedArea) {
       // Si no hay área, usamos los datos globales (copia)
       if (!selectedArea) {
         usageDataFiltered = [...usageData];
@@ -730,18 +893,18 @@ function filterUsageDataByArea(selectedArea) {
       }).sort((a, b) => b.usos - a.usos);
     }
 
-function initTablaHerramientas() {
+    // --- FUNCIÓN CORREGIDA: Renderiza la tabla de herramientas limpiando primero ---
+    function initTablaHerramientas() {
       // 1. PRIMERO: Si ya existe una DataTable, la destruimos completamente.
-      // Es vital hacerlo antes de tocar el HTML.
       if ($.fn.DataTable.isDataTable('#tablaHerramientas')) {
         $('#tablaHerramientas').DataTable().destroy();
       }
 
-      // 2. SEGUNDO: Ahora que no hay DataTable controlando la tabla, vaciamos el cuerpo HTML.
+      // 2. SEGUNDO: Vaciamos el cuerpo HTML.
       const tbody = $("#tablaHerramientas tbody");
       tbody.empty();
 
-      // 3. TERCERO: Generamos las nuevas filas con los datos filtrados (usageDataFiltered)
+      // 3. TERCERO: Generamos las nuevas filas
       usageDataFiltered.forEach(row => {
         const tr = $("<tr>");
         tr.append($("<td>").text(row.herramienta));
@@ -765,17 +928,18 @@ function initTablaHerramientas() {
         tbody.append(tr);
       });
 
-      // 4. CUARTO: Reinicializamos DataTables sobre el HTML limpio y nuevo.
+      // 4. CUARTO: Reinicializamos DataTables
       $("#tablaHerramientas").DataTable({
         paging: false,
         info: false,
         searching: false,
-        order: [[1, "desc"]], // Ordenar por 'Usos absolutos' descendente
+        order: [[1, "desc"]],
         language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
       });
     }
 
-function updateToolCharts() {
+    // --- FUNCIÓN CORREGIDA: Renderiza gráficos con protección anti-crash ---
+    function updateToolCharts() {
       const labels = usageDataFiltered.map(u => u.herramienta);
       const usosDataChart = usageDataFiltered.map(u => u.usos);
       const valoracionesDataChart = usageDataFiltered.map(u => u.valoracion_media);
@@ -834,7 +998,8 @@ function updateToolCharts() {
       // Inicializar gráficos de herramientas con los datos completos
       updateToolCharts();
     }
-// --- NUEVA FUNCIÓN: Calcula y pinta la tabla de procesos filtrada por área ---
+
+    // --- NUEVA FUNCIÓN: Calcula y pinta la tabla de procesos filtrada por área ---
     function updateProcessTableByArea(selectedArea) {
       
       // 1. Preparamos un mapa de valoraciones para ir rápido
@@ -929,7 +1094,8 @@ function updateToolCharts() {
         language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
       });
     }
-   function initTablasProcesos() {
+
+    function initTablasProcesos() {
       // 1. Rellenar el desplegable de Áreas
       const select = $("#filtroAreaProcesos");
       select.empty().append('<option value="">Todas</option>');
@@ -951,7 +1117,6 @@ function updateToolCharts() {
       
 
       // --- MANTENEMOS LA TABLA DE LA SEGUNDA PESTAÑA (Análisis por Área) ---
-      // (Esto sigue igual que antes para no romper la otra pestaña)
       const tbodyArea = $("#tablaAreaProcesos tbody");
       tbodyArea.empty();
       if ($.fn.DataTable.isDataTable('#tablaAreaProcesos')) { $('#tablaAreaProcesos').DataTable().destroy(); }
