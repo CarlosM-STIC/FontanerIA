@@ -385,78 +385,6 @@
           </div>
         </div>
       </div>
-    </section>
-    <section class="mb-4">
-      <div class="section-title mb-2">
-        <i class="bi bi-chat-left-text-fill"></i>
-        Comentarios cualitativos
-      </div>
-      <p>
-        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComentarios" aria-expanded="false" aria-controls="collapseComentarios">
-          Ver / Ocultar Comentarios
-        </button>
-      </p>
-      <div class="collapse" id="collapseComentarios">
-        <div class="card mb-3">
-          <div class="card-body">
-            <div class="row g-2 align-items-center flex-wrap">
-              <div class="col-md-2 col-6">
-                <div class="filter-chip w-100">
-                  <label for="filtroArea">Área</label>
-                  <select id="filtroArea" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
-                    <option value="">Todas</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2 col-6">
-                <div class="filter-chip w-100">
-                  <label for="filtroCategoria">Categoría</label>
-                  <select id="filtroCategoria" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
-                    <option value="">Todas</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-3 col-12">
-                <div class="filter-chip w-100 mt-2 mt-md-0">
-                  <label for="filtroSubcategoria">Subcategoría</label>
-                  <select id="filtroSubcategoria" class="form-select form-select-sm border-0 bg-transparent d-inline w-100">
-                    <option value="">Todas</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2 col-6">
-                <div class="filter-chip w-100 mt-2 mt-md-0">
-                  <label for="filtroHerramienta">Herramienta</label>
-                  <select id="filtroHerramienta" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
-                    <option value="">Todas</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2 col-6">
-                <div class="filter-chip w-100 mt-2 mt-md-0">
-                  <label for="filtroIa">Uso de IA</label>
-                  <select id="filtroIa" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
-                    <option value="">Todas</option>
-                    <option value="si">Sí usan IA</option>
-                    <option value="no">No usan IA</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-3 col-12">
-                <div class="filter-chip w-100 mt-2 mt-md-0">
-                  <label for="busquedaTexto">Texto</label>
-                  <input id="busquedaTexto" type="text" class="form-control form-control-sm border-0 bg-transparent d-inline w-auto"
-                    placeholder="Buscar en comentarios…" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="contenedorComentarios"></div>
-        <p class="small text-muted mt-2" id="resumenComentarios"></p>
-      </div>
-    </section>
-  </main>
   <footer>
     Panel generado automáticamente a partir del fichero <strong>fontaneria_datos.xlsx</strong>.
   </footer>
@@ -847,40 +775,46 @@ function initTablaHerramientas() {
       });
     }
 
-    function updateToolCharts() {
+function updateToolCharts() {
       const labels = usageDataFiltered.map(u => u.herramienta);
       const usosDataChart = usageDataFiltered.map(u => u.usos);
       const valoracionesDataChart = usageDataFiltered.map(u => u.valoracion_media);
 
       // 1. Gráfico de usos por herramienta
-      if (chartUsos) chartUsos.destroy();
-      const ctxUsos = document.getElementById("chartUsosHerramientas").getContext("2d");
-      chartUsos = new Chart(ctxUsos, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [{ label: "Número de usos", data: usosDataChart }]
-        },
-        options: {
-          indexAxis: "y", responsive: true, plugins: { legend: { display: false } },
-          scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
-        }
-      });
+      const canvasUsos = document.getElementById("chartUsosHerramientas");
+      if (canvasUsos) { // Solo ejecutamos si el canvas existe
+        if (chartUsos) chartUsos.destroy();
+        const ctxUsos = canvasUsos.getContext("2d");
+        chartUsos = new Chart(ctxUsos, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [{ label: "Número de usos", data: usosDataChart }]
+          },
+          options: {
+            indexAxis: "y", responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+      }
 
       // 2. Gráfico de valoraciones
-      if (chartValoraciones) chartValoraciones.destroy();
-      const ctxVal = document.getElementById("chartValoracionesHerramientas").getContext("2d");
-      chartValoraciones = new Chart(ctxVal, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [{ label: "Valoración media", data: valoracionesDataChart }]
-        },
-        options: {
-          responsive: true, plugins: { legend: { display: false } },
-          scales: { y: { suggestedMin: 1, suggestedMax: 5 } }
-        }
-      });
+      const canvasVal = document.getElementById("chartValoracionesHerramientas");
+      if (canvasVal) { // Solo ejecutamos si el canvas existe
+        if (chartValoraciones) chartValoraciones.destroy();
+        const ctxVal = canvasVal.getContext("2d");
+        chartValoraciones = new Chart(ctxVal, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [{ label: "Valoración media", data: valoracionesDataChart }]
+          },
+          options: {
+            responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { suggestedMin: 1, suggestedMax: 5 } }
+          }
+        });
+      }
     }
 
     function initGraficos() {
