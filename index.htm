@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel de resultados FontanerIA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --brand-main: #b4bc32;
+      --brand-main-dark: #7f851f;
+      --brand-bg: #f5f7f2;
+      --text-main: #222222;
+      --text-muted: #6c757d;
+      --card-border: #e0e4d7;
+    }
+    body {
+      background: var(--brand-bg);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .navbar {
+      background: #ffffff;
+      border-bottom: 3px solid var(--brand-main);
+    }
+    .navbar-brand span {
+      color: var(--brand-main-dark);
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .brand-pill {
+      background: var(--brand-main);
+      color: #fff;
+      padding: .15rem .5rem;
+      border-radius: 999px;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .page-title {
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .75rem;
+    }
+    .section-title i {
+      color: var(--brand-main-dark);
+    }
+    .card {
+      border-radius: 1rem;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 20px rgba(0,0,0,.03);
+    }
+    .stat-card-main {
+      background: linear-gradient(135deg, #b4bc32, #d2da5b);
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card-main::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.4);
+      top: -40px;
+      right: -40px;
+    }
+    .stat-label {
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .stat-sub {
+      font-size: .9rem;
+      color: var(--text-muted);
+    }
+    .badge-soft {
+      background-color: rgba(180,188,50,.15);
+      color: var(--brand-main-dark);
+      border-radius: 999px;
+      padding: .25rem .5rem;
+      font-size: .75rem;
+    }
+    .nav-pills .nav-link {
+      border-radius: 999px;
+      padding: .35rem .9rem;
+      font-size: .85rem;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+    }
+    .nav-pills .nav-link.active {
+      background-color: var(--brand-main);
+      border-color: var(--brand-main);
+    }
+    .table thead th {
+      background-color: #f4f5ea;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      border-bottom-width: 0;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+      border-radius: 999px;
+      border: 1px solid #dee2e6;
+      padding: .25rem .75rem;
+      font-size: .85rem;
+    }
+    .filter-chip {
+      border-radius: 999px;
+      border: 1px solid #dde3c4;
+      padding: .25rem .75rem;
+      font-size: .8rem;
+      background-color: #fbfcf7;
+    }
+    .filter-chip label {
+      margin-right: .35rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .comment-card {
+      border-left: 3px solid var(--brand-main);
+      background-color: #ffffff;
+      margin-bottom: 1rem;
+    }
+    .comment-meta {
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+    footer {
+      font-size: .8rem;
+      color: var(--text-muted);
+      padding: 2rem 0 1rem;
+      text-align: center;
+    }
+    #loadingMessage {
+      border-left: 4px solid var(--brand-main);
+      background: #fffefa;
+    }
+    .chart-selection-message {
+      text-align: center;
+      padding: 2rem;
+      border: 1px dashed var(--card-border);
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <span class="brand-pill">FontanerIA</span>
+        <span>Panel de resultados</span>
+      </a>
+    </div>
+  </nav>
+  <main class="container-fluid px-4 py-4 py-md-5">
+    <div id="loadingMessage" class="alert alert-light d-flex align-items-center mb-4" role="alert">
+      <div class="spinner-border spinner-border-sm me-3" role="status" aria-hidden="true"></div>
+      <div>
+        Cargando datos desde <strong>fontaneria_datos.xlsx</strong>…
+      </div>
+    </div>
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-8">
+        <h1 class="page-title mb-1">Uso de herramientas de IA en SinergiaTIC</h1>
+        <p class="text-muted mb-0">
+          Panel interactivo construido a partir de los datos reales de la encuesta <strong>FontanerIA</strong>.
+          Todos los indicadores se calculan directamente sobre la hoja de cálculo original.
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <span class="badge-soft">
+          <i class="bi bi-shield-check me-1"></i>
+          Datos consolidados · 2025-11-11
+        </span>
+      </div>
+    </div>
+    <section class="mb-4">
+      <div class="section-title">
+        <i class="bi bi-people-fill"></i>
+        Participación y adopción de IA
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card stat-card-main h-100">
+            <div class="card-body">
+              <div class="stat-label text-uppercase mb-1">Personas que han contestado</div>
+              <div class="stat-value" id="totalParticipantes">–</div>
+              <div class="d-flex justify-content-between mt-2">
+                <div>
+                  <div class="small opacity-75">Usan IA</div>
+                  <div class="fw-semibold" id="usaIaResumen">–</div>
+                </div>
+                <div>
+                  <div class="small opacity-75">No usan IA</div>
+                  <div class="fw-semibold" id="noIaResumen">–</div>
+                </div>
+              </div>
+              <div class="mt-3 small opacity-75">
+                Media de <span class="fw-semibold" id="mediaUsos">–</span> usos declarados por persona.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <div class="stat-label mb-1">Usos de IA declarados</div>
+                <div class="stat-value mb-1" id="totalUsos">–</div>
+                <div class="stat-sub">
+                  Casos de uso concretos descritos en el formulario
+                  (combinación de proceso, tarea y herramientas).
+                </div>
+              </div>
+              <div class="mt-3">
+                <canvas id="chartAreas" height="120"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <div class="stat-label mb-1">Valoración global de las herramientas</div>
+                <div class="d-flex align-items-baseline gap-2">
+                  <div class="stat-value" id="valoracionGlobal">–</div>
+                  <div class="small text-muted">/ 5</div>
+                </div>
+                <div class="stat-sub">
+                  Media de todas las valoraciones registradas en la pestaña
+                  <strong>Herramientas</strong> de la hoja de cálculo.
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="progress" role="progressbar" aria-label="Valoración global">
+                  <div class="progress-bar" id="valoracionGlobalBar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="mb-4">
+      <div class="section-title">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        Herramientas y patrones de uso
+      </div>
+      <div class="filter-chip mb-3">
+        <label for="filtroAreaHerramientas">Filtrar por Área</label>
+        <select id="filtroAreaHerramientas" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <ul class="nav nav-pills mb-3" id="toolTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-resumen" data-bs-toggle="pill"
+            data-bs-target="#panel-resumen" type="button" role="tab">
+            Resumen y ranking
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-graficos" data-bs-toggle="pill"
+            data-bs-target="#panel-graficos" type="button" role="tab">
+            Gráficos interactivos
+          </button>
+        </li>
+      </ul>
+<div class="tab-content">
+        
+        <div class="tab-pane fade show active" id="panel-procesos-resumen" role="tabpanel">
+
+          <div class="filter-chip mb-3">
+            <label for="filtroAreaProcesos">Filtrar por Área</label>
+            <select id="filtroAreaProcesos" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="stat-label mb-0">Resumen de Procesos</div>
+                <div class="small text-muted">Procesos identificados: <strong id="conteoProcesosDinamico">–</strong></div>
+              </div>
+              <p class="mb-0 small text-muted">
+                Solo se incluyen los usos donde `no_ia` es FALSE (procesos que utilizan IA).
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <table id="tablaProcesos" class="table table-striped table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Proceso</th>
+                    <th>Usos (Con IA)</th>
+                    <th>Herramientas/Uso (Media)</th>
+                    <th>Valoración Media (Herramientas)</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="panel-procesos-area" role="tabpanel">
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="stat-label mb-0">Comparativa de Usos de IA por Área</div>
+              <p class="mb-0 small text-muted">
+                Agrupación por el área a la que pertenece el usuario que declaró el uso con IA.
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <table id="tablaAreaProcesos" class="table table-striped table-hover w-100">
+                <thead>
+                  <tr>
+                    <th>Área</th>
+                    <th>Usos (Con IA)</th>
+                    <th>Procesos Únicos (en el Área)</th>
+                    <th>Herramientas/Uso (Media)</th>
+                    <th>Valoración Media (Herramientas)</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="panel-graficos-area" role="tabpanel">
+          <div class="row g-3">
+            <div class="col-md-12">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="stat-label mb-0">Valoración Media por Área</div>
+                    <div class="small text-muted">Satisfacción de herramientas (Escala 1 a 5)</div>
+                  </div>
+                  <canvas id="chartAreaRating" height="120"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="stat-label mb-0">Valoración de Procesos por Área Seleccionada</div>
+                    <div class="small text-muted" id="procesoRatingTitle">
+                      Haz clic en una barra del gráfico superior para ver el detalle de los procesos.
+                    </div>
+                  </div>
+                  <div id="chartProcesoRatingContainer">
+                    <canvas id="chartProcesoRating" height="150"></canvas>
+                    <div class="chart-selection-message" id="procesoRatingMessage">
+                      Selecciona un Área en el gráfico superior para ver la valoración de sus Procesos.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="mb-4">
+      <div class="section-title mb-2">
+        <i class="bi bi-chat-left-text-fill"></i>
+        Comentarios cualitativos
+      </div>
+      <p>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComentarios" aria-expanded="false" aria-controls="collapseComentarios">
+          Ver / Ocultar Comentarios
+        </button>
+      </p>
+      <div class="collapse" id="collapseComentarios">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row g-2 align-items-center flex-wrap">
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100">
+                  <label for="filtroArea">Área</label>
+                  <select id="filtroArea" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100">
+                  <label for="filtroCategoria">Categoría</label>
+                  <select id="filtroCategoria" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3 col-12">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="filtroSubcategoria">Subcategoría</label>
+                  <select id="filtroSubcategoria" class="form-select form-select-sm border-0 bg-transparent d-inline w-100">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="filtroHerramienta">Herramienta</label>
+                  <select id="filtroHerramienta" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="filtroIa">Uso de IA</label>
+                  <select id="filtroIa" class="form-select form-select-sm border-0 bg-transparent d-inline w-auto">
+                    <option value="">Todas</option>
+                    <option value="si">Sí usan IA</option>
+                    <option value="no">No usan IA</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3 col-12">
+                <div class="filter-chip w-100 mt-2 mt-md-0">
+                  <label for="busquedaTexto">Texto</label>
+                  <input id="busquedaTexto" type="text" class="form-control form-control-sm border-0 bg-transparent d-inline w-auto"
+                    placeholder="Buscar en comentarios…" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="contenedorComentarios"></div>
+        <p class="small text-muted mt-2" id="resumenComentarios"></p>
+      </div>
+    </section>
+  </main>
+  <footer>
+    Panel generado automáticamente a partir del fichero <strong>fontaneria_datos.xlsx</strong>.
+  </footer>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    // Variables globales cargadas desde el Excel
+    let usosData = [];
+    let herramientasData = [];
+    let participantsSummary = null;
+    let usageData = [];
+    let usageDataFiltered = [];
+    let commentsData = [];
+    let areaData = [];
+    let globalRatingMean = null;
+    let procesosAnalysis = [];
+    let areaAnalysis = [];
+    let totalProcesosUnicos = 0;
+    let processRatingByArea = {};
+
+    // Gráficos instanciados (aseguramos que existen para poder destruirlos)
+    let chartAreas = null;
+    let chartUsos = null;
+    let chartValoraciones = null;
+    let chartAreaRating = null;
+    let chartProcesoRating = null;
+
+    // Lee el fichero fontaneria_datos.xlsx y deja todo preprocesado
+    async function loadExcelData() {
+      const response = await fetch("fontaneria_datos.xlsx");
+      if (!response.ok) {
+        throw new Error("No se puede cargar fontaneria_datos.xlsx");
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const data = new Uint8Array(arrayBuffer);
+      const workbook = XLSX.read(data, { type: "array" });
+
+      const usosSheet = workbook.Sheets["Usos"];
+      const herrSheet = workbook.Sheets["Herramientas"];
+      if (!usosSheet || !herrSheet) {
+        throw new Error("No se encuentran las hojas 'Usos' y 'Herramientas' en el Excel");
+      }
+
+      usosData = XLSX.utils.sheet_to_json(usosSheet, { defval: null });
+      herramientasData = XLSX.utils.sheet_to_json(herrSheet, { defval: null });
+
+      computeAggregates();
+    }
+
+    function computeAggregates() {
+      const participantsMap = {};
+      usosData.forEach(row => {
+        const id = row.submission_id;
+        if (!id) return;
+        if (!participantsMap[id]) {
+          participantsMap[id] = { no_ia: !!row.no_ia, area: row.area || "" };
+        } else {
+          if (row.no_ia === true) { participantsMap[id].no_ia = true; }
+        }
+      });
+      const participantIds = Object.keys(participantsMap);
+      const totalParticipantes = participantIds.length;
+      let usaIa = 0;
+      let noIa = 0;
+      participantIds.forEach(id => { if (participantsMap[id].no_ia) noIa++; else usaIa++; });
+
+      participantsSummary = {
+        total_participantes: totalParticipantes,
+        usa_ia: usaIa,
+        no_ia: noIa,
+        porcentaje_usa_ia: totalParticipantes ? +(usaIa * 100 / totalParticipantes).toFixed(1) : 0,
+        porcentaje_no_ia: totalParticipantes ? +(noIa * 100 / totalParticipantes).toFixed(1) : 0,
+        total_usos: usosData.filter(r => r.no_ia !== true).length,
+        media_usos_por_persona: totalParticipantes ? +(usosData.filter(r => r.no_ia !== true).length / totalParticipantes).toFixed(2) : 0
+      };
+
+      const areaMap = {};
+      participantIds.forEach(id => {
+        const area = participantsMap[id].area || "Sin área";
+        if (!areaMap[area]) { areaMap[area] = new Set(); }
+        areaMap[area].add(id);
+      });
+      areaData = Object.keys(areaMap).sort().map(a => ({
+        area: a,
+        participantes: areaMap[a].size
+      }));
+
+      const totalIaUsers = usaIa;
+      usageData = [];
+      const allRatings = [];
+      const toolsMap = {};
+      herramientasData.forEach(row => {
+        const tool = row.herramienta;
+        if (!tool) return;
+        if (!toolsMap[tool]) toolsMap[tool] = [];
+        toolsMap[tool].push(row);
+      });
+      const totalToolRows = herramientasData.length;
+      let maxUsos = 0;
+      Object.keys(toolsMap).forEach(tool => {
+        const usosTool = toolsMap[tool].length;
+        if (usosTool > maxUsos) maxUsos = usosTool;
+      });
+
+      Object.keys(toolsMap).forEach(tool => {
+        const rows = toolsMap[tool];
+        const usosTool = rows.length;
+        const participantesToolSet = new Set();
+        let sumRating = 0;
+        let nRatings = 0;
+        const payByParticipant = {};
+
+        rows.forEach(r => {
+          const sid = r.submission_id;
+          if (sid) {
+            participantesToolSet.add(sid);
+            if (!payByParticipant[sid]) { payByParticipant[sid] = !!r.es_de_pago; } else { payByParticipant[sid] = payByParticipant[sid] || !!r.es_de_pago; }
+          }
+          const val = parseFloat(r.valoracion);
+          if (!isNaN(val) && val >= 1 && val <= 5) {
+            sumRating += val;
+            nRatings++;
+            allRatings.push(val);
+          }
+        });
+
+        const participantesTool = participantesToolSet.size;
+        const valoracionMedia = nRatings ? (sumRating / nRatings) : null;
+        const valoracionPonderada = (valoracionMedia != null && maxUsos > 0)
+          ? valoracionMedia * (usosTool / maxUsos)
+          : null;
+
+        let personasPagan = 0;
+        Object.keys(payByParticipant).forEach(pid => { if (payByParticipant[pid]) personasPagan++; });
+        const porcentajePagan = participantesTool ? (personasPagan * 100 / participantesTool) : 0;
+
+        usageData.push({
+          herramienta: tool, usos: usosTool, participantes: participantesTool,
+          porcentaje_usos: totalToolRows ? +(usosTool * 100 / totalToolRows).toFixed(1) : 0,
+          porcentaje_participantes: totalIaUsers ? +(participantesTool * 100 / totalIaUsers).toFixed(1) : 0,
+          valoracion_media: valoracionMedia != null ? +valoracionMedia.toFixed(2) : null,
+          valoracion_ponderada: valoracionPonderada != null ? +valoracionPonderada.toFixed(2) : null,
+          personas_pagan: personasPagan,
+          porcentaje_pagan_sobre_usuarios: +(porcentajePagan.toFixed(1))
+        });
+      });
+
+      usageData.sort((a, b) => b.usos - a.usos);
+      usageDataFiltered = [...usageData];
+
+      globalRatingMean = allRatings.length
+        ? +(allRatings.reduce((acc, v) => acc + v, 0) / allRatings.length).toFixed(2)
+        : null;
+
+      commentsData = [];
+      usosData.forEach(row => {
+        const comentario = row.comentario;
+        if (typeof comentario !== "string" || !comentario.trim()) return;
+        const tools = [];
+        if (typeof row.herramientas_json === "string" && row.herramientas_json.trim()) {
+          try {
+            const parsed = JSON.parse(row.herramientas_json);
+            parsed.forEach(t => { if (t && t.nombre) tools.push(t.nombre); });
+          } catch (e) { console.warn("No se puede parsear herramientas_json", e); }
+        }
+        commentsData.push({
+          area: row.area || "", usa_ia: !row.no_ia, proceso: row.proceso || "", tarea: row.tarea_y_finalidad || "", comentario: comentario, herramientas: tools
+        });
+      });
+
+      // --- AGREGADOS DE PROCESOS Y ÁREAS CON IA ---
+      const usoValoracionMap = {};
+      herramientasData.forEach(r => {
+        const key = r.submission_id + "_" + r.uso_index;
+        if (!usoValoracionMap[key]) { usoValoracionMap[key] = { sum: 0, count: 0 }; }
+        const val = parseFloat(r.valoracion);
+        if (!isNaN(val) && val >= 1 && val <= 5) { usoValoracionMap[key].sum += val; usoValoracionMap[key].count++; }
+      });
+      const procesosMap = {};
+      const procesosUnicosSet = new Set();
+      const procesosAreaAggMap = {};
+      const areaProcesoRatingMap = {};
+
+      usosData.forEach(row => {
+        if (row.no_ia === true) return;
+        const proceso = row.proceso || "Sin Proceso";
+        const area = row.area || "Sin Área";
+        const usoKey = row.submission_id + "_" + row.uso_index;
+
+        if (!procesosMap[proceso]) { procesosMap[proceso] = { usos: 0, herramientas: 0, sum_valoracion: 0, n_valoracion: 0 }; }
+        procesosMap[proceso].usos++;
+        const herramientas = parseInt(row.num_herramientas);
+        if (!isNaN(herramientas)) { procesosMap[proceso].herramientas += herramientas; }
+
+        if (!procesosAreaAggMap[area]) { procesosAreaAggMap[area] = { usos: 0, procesos_unicos: new Set(), herramientas: 0, sum_valoracion: 0, n_valoracion: 0 }; }
+        procesosAreaAggMap[area].usos++;
+        procesosAreaAggMap[area].procesos_unicos.add(proceso);
+        if (!isNaN(herramientas)) { procesosAreaAggMap[area].herramientas += herramientas; }
+        procesosUnicosSet.add(proceso);
+
+        if (usoValoracionMap[usoKey] && usoValoracionMap[usoKey].count > 0) {
+          const usoRating = (usoValoracionMap[usoKey].sum / usoValoracionMap[usoKey].count);
+          procesosMap[proceso].sum_valoracion += usoRating;
+          procesosMap[proceso].n_valoracion++;
+          procesosAreaAggMap[area].sum_valoracion += usoRating;
+          procesosAreaAggMap[area].n_valoracion++;
+          if (!areaProcesoRatingMap[area]) { areaProcesoRatingMap[area] = {}; }
+          if (!areaProcesoRatingMap[area][proceso]) { areaProcesoRatingMap[area][proceso] = { sum: 0, count: 0 }; }
+          areaProcesoRatingMap[area][proceso].sum += usoRating;
+          areaProcesoRatingMap[area][proceso].count++;
+        }
+      });
+
+      processRatingByArea = {};
+      Object.keys(areaProcesoRatingMap).forEach(area => {
+        processRatingByArea[area] = [];
+        Object.keys(areaProcesoRatingMap[area]).forEach(proceso => {
+          const data = areaProcesoRatingMap[area][proceso];
+          if (data.count > 0) {
+            processRatingByArea[area].push({
+              proceso: proceso,
+              rating: +(data.sum / data.count).toFixed(2)
+            });
+          }
+        });
+      });
+
+      window.procesosAnalysis = Object.keys(procesosMap).map(p => {
+        const data = procesosMap[p];
+        return {
+          proceso: p, usos: data.usos,
+          media_herramientas: data.usos ? +(data.herramientas / data.usos).toFixed(2) : 0,
+          valoracion_media: data.n_valoracion ? +(data.sum_valoracion / data.n_valoracion).toFixed(2) : null
+        };
+      }).sort((a, b) => b.usos - a.usos);
+
+      window.areaAnalysis = Object.keys(procesosAreaAggMap).map(a => {
+        const data = procesosAreaAggMap[a];
+        return {
+          area: a, usos: data.usos,
+          procesos_unicos: data.procesos_unicos.size,
+          media_herramientas: data.usos ? +(data.herramientas / data.usos).toFixed(2) : 0,
+          valoracion_media: data.n_valoracion ? +(data.sum_valoracion / data.n_valoracion).toFixed(2) : null
+        };
+      }).sort((a, b) => b.usos - a.usos);
+
+      window.totalProcesosUnicos = procesosUnicosSet.size;
+    }
+
+    function initResumen() {
+      $("#totalParticipantes").text(participantsSummary.total_participantes);
+      $("#usaIaResumen").text(
+        participantsSummary.usa_ia +
+        " (" + participantsSummary.porcentaje_usa_ia.toString().replace(".", ",") + "%)"
+      );
+      $("#noIaResumen").text(
+        participantsSummary.no_ia +
+        " (" + participantsSummary.porcentaje_no_ia.toString().replace(".", ",") + "%)"
+      );
+      $("#totalUsos").text(participantsSummary.total_usos);
+      $("#mediaUsos").text(participantsSummary.media_usos_por_persona.toString().replace(".", ","));
+
+      if (globalRatingMean != null) {
+        $("#valoracionGlobal").text(globalRatingMean.toString().replace(".", ","));
+        const porcentajeBar = Math.min(100, (globalRatingMean / 5) * 100);
+        $("#valoracionGlobalBar")
+          .css({ width: porcentajeBar + "%" })
+          .text(globalRatingMean.toString().replace(".", ",") + " / 5");
+      } else {
+        $("#valoracionGlobal").text("–");
+        $("#valoracionGlobalBar").css({ width: "0%" }).text("");
+      }
+    }
+
+function filterUsageDataByArea(selectedArea) {
+      // Si no hay área, usamos los datos globales (copia)
+      if (!selectedArea) {
+        usageDataFiltered = [...usageData];
+        return;
+      }
+
+      // 1. Denominador correcto: Usuarios únicos de IA en esta área
+      const participantsIdsInArea = new Set(
+        usosData.filter(r => r.area === selectedArea).map(r => r.submission_id)
+      );
+      const totalIaUsersInArea = usosData.filter(r => r.area === selectedArea && r.no_ia !== true).length;
+
+      // 2. Filtrar filas crudas
+      const areaToolRows = herramientasData.filter(r => participantsIdsInArea.has(r.submission_id));
+
+      // 3. Re-agregar desde CERO (esto evita duplicados lógicos)
+      const filteredToolsMap = {};
+
+      areaToolRows.forEach(row => {
+        const tool = row.herramienta;
+        if (!tool) return;
+
+        if (!filteredToolsMap[tool]) {
+          filteredToolsMap[tool] = {
+            usos: 0, participantes: new Set(), sum_rating: 0, n_rating: 0, pagos: new Set()
+          };
+        }
+        filteredToolsMap[tool].usos++;
+        filteredToolsMap[tool].participantes.add(row.submission_id);
+        
+        const val = parseFloat(row.valoracion);
+        if (!isNaN(val) && val >= 1 && val <= 5) {
+          filteredToolsMap[tool].sum_rating += val;
+          filteredToolsMap[tool].n_rating++;
+        }
+        if (!!row.es_de_pago) { filteredToolsMap[tool].pagos.add(row.submission_id); }
+      });
+
+      // 4. Construir array final (usageDataFiltered se sobrescribe completamente aquí)
+      const totalFilteredToolRows = areaToolRows.length;
+      let maxUsosFiltered = 0;
+      Object.keys(filteredToolsMap).forEach(tool => {
+        if (filteredToolsMap[tool].usos > maxUsosFiltered) maxUsosFiltered = filteredToolsMap[tool].usos;
+      });
+
+      usageDataFiltered = Object.keys(filteredToolsMap).map(tool => {
+        const data = filteredToolsMap[tool];
+        const participantesTool = data.participantes.size;
+        const valoracionMedia = data.n_rating ? (data.sum_rating / data.n_rating) : null;
+        const valoracionPonderada = (valoracionMedia != null && maxUsosFiltered > 0)
+          ? valoracionMedia * (data.usos / maxUsosFiltered) : null;
+
+        return {
+          herramienta: tool,
+          usos: data.usos,
+          participantes: participantesTool,
+          porcentaje_usos: totalFilteredToolRows ? +(data.usos * 100 / totalFilteredToolRows).toFixed(1) : 0,
+          porcentaje_participantes: totalIaUsersInArea ? +(participantesTool * 100 / totalIaUsersInArea).toFixed(1) : 0,
+          valoracion_media: valoracionMedia != null ? +valoracionMedia.toFixed(2) : null,
+          valoracion_ponderada: valoracionPonderada != null ? +valoracionPonderada.toFixed(2) : null,
+          personas_pagan: data.pagos.size,
+          porcentaje_pagan_sobre_usuarios: participantesTool ? +(data.pagos.size * 100 / participantesTool).toFixed(1) : 0
+        };
+      }).sort((a, b) => b.usos - a.usos);
+    }
+
+function initTablaHerramientas() {
+      // 1. PRIMERO: Si ya existe una DataTable, la destruimos completamente.
+      // Es vital hacerlo antes de tocar el HTML.
+      if ($.fn.DataTable.isDataTable('#tablaHerramientas')) {
+        $('#tablaHerramientas').DataTable().destroy();
+      }
+
+      // 2. SEGUNDO: Ahora que no hay DataTable controlando la tabla, vaciamos el cuerpo HTML.
+      const tbody = $("#tablaHerramientas tbody");
+      tbody.empty();
+
+      // 3. TERCERO: Generamos las nuevas filas con los datos filtrados (usageDataFiltered)
+      usageDataFiltered.forEach(row => {
+        const tr = $("<tr>");
+        tr.append($("<td>").text(row.herramienta));
+        tr.append($("<td>").text(row.usos));
+        tr.append($("<td>").text(row.porcentaje_usos.toString().replace(".", ",") + " %"));
+        tr.append($("<td>").text(row.participantes));
+        tr.append($("<td>").text(row.porcentaje_participantes.toString().replace(".", ",") + " %"));
+
+        const valMediaTxt = row.valoracion_media != null
+          ? row.valoracion_media.toFixed(2).replace(".", ",")
+          : "–";
+        const valPondTxt = row.valoracion_ponderada != null
+          ? row.valoracion_ponderada.toFixed(2).replace(".", ",")
+          : "–";
+
+        tr.append($("<td>").text(valMediaTxt));
+        tr.append($("<td>").text(valPondTxt));
+        tr.append($("<td>").text(row.personas_pagan));
+        tr.append($("<td>").text(row.porcentaje_pagan_sobre_usuarios.toString().replace(".", ",") + " %"));
+
+        tbody.append(tr);
+      });
+
+      // 4. CUARTO: Reinicializamos DataTables sobre el HTML limpio y nuevo.
+      $("#tablaHerramientas").DataTable({
+        paging: false,
+        info: false,
+        searching: false,
+        order: [[1, "desc"]], // Ordenar por 'Usos absolutos' descendente
+        language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
+      });
+    }
+
+    function updateToolCharts() {
+      const labels = usageDataFiltered.map(u => u.herramienta);
+      const usosDataChart = usageDataFiltered.map(u => u.usos);
+      const valoracionesDataChart = usageDataFiltered.map(u => u.valoracion_media);
+
+      // 1. Gráfico de usos por herramienta
+      if (chartUsos) chartUsos.destroy();
+      const ctxUsos = document.getElementById("chartUsosHerramientas").getContext("2d");
+      chartUsos = new Chart(ctxUsos, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{ label: "Número de usos", data: usosDataChart }]
+        },
+        options: {
+          indexAxis: "y", responsive: true, plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+
+      // 2. Gráfico de valoraciones
+      if (chartValoraciones) chartValoraciones.destroy();
+      const ctxVal = document.getElementById("chartValoracionesHerramientas").getContext("2d");
+      chartValoraciones = new Chart(ctxVal, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{ label: "Valoración media", data: valoracionesDataChart }]
+        },
+        options: {
+          responsive: true, plugins: { legend: { display: false } },
+          scales: { y: { suggestedMin: 1, suggestedMax: 5 } }
+        }
+      });
+    }
+
+    function initGraficos() {
+      // Gráfico de áreas (participantes por área)
+      if (areaData.length > 0) {
+        if (chartAreas) chartAreas.destroy();
+        const ctxAreas = document.getElementById("chartAreas").getContext("2d");
+        chartAreas = new Chart(ctxAreas, {
+          type: "doughnut",
+          data: {
+            labels: areaData.map(a => a.area),
+            datasets: [{ data: areaData.map(a => a.participantes) }]
+          },
+          options: { plugins: { legend: { position: "bottom" } }, cutout: "65%" }
+        });
+      }
+      // Inicializar gráficos de herramientas con los datos completos
+      updateToolCharts();
+    }
+// --- NUEVA FUNCIÓN: Calcula y pinta la tabla de procesos filtrada por área ---
+    function updateProcessTableByArea(selectedArea) {
+      
+      // 1. Preparamos un mapa de valoraciones para ir rápido
+      const ratingsMap = {};
+      herramientasData.forEach(r => {
+        const key = r.submission_id + "_" + r.uso_index;
+        if (!ratingsMap[key]) ratingsMap[key] = { sum: 0, count: 0 };
+        const val = parseFloat(r.valoracion);
+        if (!isNaN(val) && val >= 1 && val <= 5) {
+          ratingsMap[key].sum += val;
+          ratingsMap[key].count++;
+        }
+      });
+
+      // 2. Filtramos y agrupamos los datos
+      const processAggMap = {};
+      
+      usosData.forEach(row => {
+        // A) Filtro: Solo procesos con IA
+        if (row.no_ia === true) return; 
+        // B) Filtro: Si hay área seleccionada, debe coincidir. Si es "", pasan todas.
+        if (selectedArea && row.area !== selectedArea) return;
+
+        const procesoName = row.proceso || "Sin Proceso Definido";
+        
+        if (!processAggMap[procesoName]) {
+          processAggMap[procesoName] = {
+            usos: 0,
+            herramientas_total: 0,
+            sum_valoracion_media_uso: 0,
+            count_valoracion: 0
+          };
+        }
+
+        processAggMap[procesoName].usos++;
+        
+        const numHerramientas = parseInt(row.num_herramientas);
+        if (!isNaN(numHerramientas)) {
+          processAggMap[procesoName].herramientas_total += numHerramientas;
+        }
+
+        // Valoración promedio de este uso concreto
+        const usoKey = row.submission_id + "_" + row.uso_index;
+        if (ratingsMap[usoKey] && ratingsMap[usoKey].count > 0) {
+          const avgRatingThisUse = ratingsMap[usoKey].sum / ratingsMap[usoKey].count;
+          processAggMap[procesoName].sum_valoracion_media_uso += avgRatingThisUse;
+          processAggMap[procesoName].count_valoracion++;
+        }
+      });
+
+      // 3. Convertimos a lista ordenada
+      const tableData = Object.keys(processAggMap).map(procName => {
+        const data = processAggMap[procName];
+        return {
+          proceso: procName,
+          usos: data.usos,
+          media_herramientas: data.usos ? (data.herramientas_total / data.usos) : 0,
+          valoracion_media: data.count_valoracion ? (data.sum_valoracion_media_uso / data.count_valoracion) : null
+        };
+      }).sort((a, b) => b.usos - a.usos);
+
+      // 4. Actualizamos el número total en la tarjeta
+      $("#conteoProcesosDinamico").text(tableData.length);
+
+      // 5. Pintamos la tabla (limpiando y creando de nuevo para evitar errores)
+      if ($.fn.DataTable.isDataTable('#tablaProcesos')) {
+        $('#tablaProcesos').DataTable().destroy();
+      }
+      
+      const tbody = $("#tablaProcesos tbody");
+      tbody.empty();
+
+      tableData.forEach(row => {
+        const tr = $("<tr>");
+        tr.append($("<td>").text(row.proceso));
+        tr.append($("<td>").text(row.usos));
+        tr.append($("<td>").text(row.media_herramientas.toFixed(2).replace(".", ",")));
+        
+        const valTxt = row.valoracion_media != null 
+          ? row.valoracion_media.toFixed(2).replace(".", ",") 
+          : "–";
+        tr.append($("<td>").text(valTxt));
+        
+        tbody.append(tr);
+      });
+
+      $("#tablaProcesos").DataTable({
+        paging: false,
+        info: false,
+        searching: true,
+        order: [[1, "desc"]],
+        language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
+      });
+    }
+   function initTablasProcesos() {
+      // 1. Rellenar el desplegable de Áreas
+      const select = $("#filtroAreaProcesos");
+      select.empty().append('<option value="">Todas</option>');
+      
+      // Usamos 'areaData' que ya tenemos calculada globalmente y ordenamos
+      const areasOrdenadas = areaData.map(a => a.area).sort();
+      areasOrdenadas.forEach(area => {
+        select.append(`<option value="${area}">${area}</option>`);
+      });
+
+      // 2. Activar el "escucha" para cuando cambies el desplegable
+      select.off("change").on("change", function() {
+        const area = $(this).val();
+        updateProcessTableByArea(area); // ¡Llamamos a la lógica nueva!
+      });
+
+      // 3. Carga inicial (mostrando todas)
+      updateProcessTableByArea(""); 
+      
+
+      // --- MANTENEMOS LA TABLA DE LA SEGUNDA PESTAÑA (Análisis por Área) ---
+      // (Esto sigue igual que antes para no romper la otra pestaña)
+      const tbodyArea = $("#tablaAreaProcesos tbody");
+      tbodyArea.empty();
+      if ($.fn.DataTable.isDataTable('#tablaAreaProcesos')) { $('#tablaAreaProcesos').DataTable().destroy(); }
+
+      window.areaAnalysis.forEach(row => {
+        const tr = $("<tr>");
+        tr.append($("<td>").text(row.area));
+        tr.append($("<td>").text(row.usos));
+        tr.append($("<td>").text(row.procesos_unicos));
+        tr.append($("<td>").text(row.media_herramientas.toString().replace(".", ",")));
+        const valMediaTxt = row.valoracion_media != null ? row.valoracion_media.toFixed(2).replace(".", ",") : "–";
+        tr.append($("<td>").text(valMediaTxt));
+        tbodyArea.append(tr);
+      });
+
+      $("#tablaAreaProcesos").DataTable({
+        paging: false, info: false, searching: true, order: [[1, "desc"]],
+        language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
+      });
+    }
+
+    function initAreaRatingCharts() {
+      const labels = window.areaAnalysis.map(a => a.area);
+      const ratings = window.areaAnalysis.map(a => a.valoracion_media);
+
+      const ctxArea = document.getElementById("chartAreaRating").getContext("2d");
+      if (chartAreaRating) chartAreaRating.destroy();
+
+      chartAreaRating = new Chart(ctxArea, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{ label: "Valoración Media de Herramientas", data: ratings, backgroundColor: 'rgba(180, 188, 50, 0.8)' }]
+        },
+        options: {
+          responsive: true, plugins: { legend: { display: false } }, scales: { y: { suggestedMin: 1, suggestedMax: 5 } },
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const firstElement = elements[0];
+              const index = firstElement.index;
+              const areaSeleccionada = labels[index];
+              updateProcesoRatingChart(areaSeleccionada);
+            }
+          }
+        }
+      });
+
+      $("#chartProcesoRatingContainer").show();
+      $("#procesoRatingMessage").show();
+      updateProcesoRatingChart(null);
+    }
+
+    function updateProcesoRatingChart(area) {
+      if (chartProcesoRating) chartProcesoRating.destroy();
+      const ctxProceso = document.getElementById("chartProcesoRating").getContext("2d");
+
+      if (!area || !processRatingByArea[area] || processRatingByArea[area].length === 0) {
+        $("#procesoRatingTitle").text("Haz clic en una barra del gráfico superior para ver el detalle de los procesos.");
+        $("#chartProcesoRating").hide();
+        $("#procesoRatingMessage").show();
+        return;
+      }
+
+      $("#procesoRatingMessage").hide();
+      $("#chartProcesoRating").show();
+      $("#procesoRatingTitle").html(`Valoración Media de Herramientas para Procesos en **${area}**`);
+
+      const procesos = processRatingByArea[area].sort((a, b) => b.rating - a.rating);
+
+      chartProcesoRating = new Chart(ctxProceso, {
+        type: "bar",
+        data: {
+          labels: procesos.map(p => p.proceso),
+          datasets: [{ label: "Valoración Media", data: procesos.map(p => p.rating), backgroundColor: 'rgba(127, 133, 31, 0.9)', }]
+        },
+        options: {
+          indexAxis: 'y', responsive: true, plugins: { legend: { display: false } },
+          scales: { x: { suggestedMin: 1, suggestedMax: 5 } }
+        }
+      });
+    }
+
+
+    function initComentarios() {
+      const cont = $("#contenedorComentarios");
+      cont.empty();
+
+      const areas = [...new Set(commentsData.map(c => c.area).filter(Boolean))].sort();
+      const categorias = [...new Set(commentsData.map(c => c.proceso).filter(Boolean))].sort();
+      const subcategorias = [...new Set(commentsData.map(c => c.tarea).filter(Boolean))].sort();
+
+      $("#filtroArea").empty().append('<option value="">Todas</option>');
+      $("#filtroAreaHerramientas").empty().append('<option value="">Todas</option>');
+      areas.forEach(a => {
+        $("#filtroArea").append(`<option value="${a}">${a}</option>`);
+        $("#filtroAreaHerramientas").append(`<option value="${a}">${a}</option>`);
+      });
+
+      $("#filtroCategoria").empty().append('<option value="">Todas</option>');
+      categorias.forEach(c => { $("#filtroCategoria").append(`<option value="${c}">${c}</option>`); });
+
+      $("#filtroSubcategoria").empty().append('<option value="">Todas</option>');
+      subcategorias.forEach(s => { $("#filtroSubcategoria").append(`<option value="${s}">${s}</option>`); });
+
+      const herramientasSet = new Set();
+      commentsData.forEach(c => { (c.herramientas || []).forEach(h => herramientasSet.add(h)); });
+      const herramientas = [...herramientasSet].sort();
+
+      $("#filtroHerramienta").empty().append('<option value="">Todas</option>');
+      herramientas.forEach(h => { $("#filtroHerramienta").append(`<option value="${h}">${h}</option>`); });
+
+      function pasaFiltros(c) {
+        const area = $("#filtroArea").val();
+        const categoria = $("#filtroCategoria").val();
+        const subcategoria = $("#filtroSubcategoria").val();
+        const herramienta = $("#filtroHerramienta").val();
+        const ia = $("#filtroIa").val();
+        const texto = $("#busquedaTexto").val().toLowerCase();
+
+        if (area && c.area !== area) return false;
+        if (categoria && c.proceso !== categoria) return false;
+        if (subcategoria && c.tarea !== subcategoria) return false;
+        if (herramienta && !(c.herramientas || []).includes(herramienta)) return false;
+        if (ia === "si" && !c.usa_ia) return false;
+        if (ia === "no" && c.usa_ia) return false;
+
+        if (texto) {
+          const blob = [c.proceso || "", c.tarea || "", c.comentario || "", (c.herramientas || []).join(" ")].join(" ").toLowerCase();
+          if (!blob.includes(texto)) return false;
+        }
+        return true;
+      }
+
+      function pintarComentarios() {
+        cont.empty();
+        const filtrados = commentsData.filter(pasaFiltros);
+        filtrados.forEach(c => {
+          const badgeIa = c.usa_ia
+            ? '<span class="badge rounded-pill text-bg-success bg-opacity-10 border border-success border-opacity-25 text-success-emphasis me-1">Usa IA</span>'
+            : '<span class="badge rounded-pill text-bg-secondary bg-opacity-10 border border-secondary border-opacity-25 text-secondary-emphasis me-1">No usa IA</span>';
+          const herramientasTxt = (c.herramientas || []).length ? c.herramientas.join(", ") : "Sin herramientas asociadas";
+          const card = $(`
+            <div class="card comment-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <div class="comment-meta"><strong>Área:</strong> ${c.area || "–"} · <strong>Categoría:</strong> ${c.proceso || "–"}</div>
+                  <div class="comment-meta text-end">${badgeIa}</div>
+                </div>
+                <div class="comment-meta mb-2"><strong>Subcategoría / tarea:</strong> ${c.tarea || "–"}<br/><strong>Herramientas:</strong> ${herramientasTxt}</div>
+                <p class="mb-0">${c.comentario}</p>
+              </div>
+            </div>
+          `);
+          cont.append(card);
+        });
+        $("#resumenComentarios").text(filtrados.length + " comentario(s) mostrados de un total de " + commentsData.length + ".");
+      }
+
+      $("#filtroArea, #filtroCategoria, #filtroSubcategoria, #filtroHerramienta, #filtroIa").on("change", pintarComentarios);
+      $("#busquedaTexto").on("input", pintarComentarios);
+
+      $("#filtroAreaHerramientas").on("change", function () {
+        const selectedArea = $(this).val();
+        filterUsageDataByArea(selectedArea);
+        initTablaHerramientas();
+        updateToolCharts();
+      });
+
+      pintarComentarios();
+    }
+
+    $(async function () {
+      try {
+        await loadExcelData();
+        $("#loadingMessage").removeClass("d-flex").hide();
+
+        initResumen();
+        initTablaHerramientas();
+        initGraficos();
+        initComentarios();
+        initTablasProcesos();
+        initAreaRatingCharts();
+
+      } catch (e) {
+        console.error(e);
+        $("#loadingMessage").removeClass("alert-light").addClass("alert-danger");
+        $("#loadingMessage").html(
+          '<i class="bi bi-exclamation-triangle-fill me-2"></i>' +
+          'Error cargando datos. Asegúrate de que el fichero <strong>fontaneria_datos.xlsx</strong> está en la misma carpeta que este HTML.'
+        );
+      }
+    });
+  </script>
+</body>
+</html>
